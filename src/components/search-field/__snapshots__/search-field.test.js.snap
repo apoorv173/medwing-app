@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="form-group"
+>
+  <label
+    htmlFor="searchBox"
+  >
+    Enter location
+  </label>
+  <input
+    className="form-control"
+    name="searchBox"
+    onChange={[Function]}
+    placeholder="Please enter the location to search"
+    type="text"
+  />
+</div>
+`;

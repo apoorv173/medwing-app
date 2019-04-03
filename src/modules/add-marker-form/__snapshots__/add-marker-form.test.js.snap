@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+Array [
+  <strong>
+    Edit marker for 
+  </strong>,
+  <hr />,
+  <form
+    className="form-section"
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <label
+        htmlFor="searchBox"
+      >
+        Enter location
+      </label>
+      <input
+        className="form-control"
+        name="searchBox"
+        onChange={[Function]}
+        placeholder="Please enter the location to search"
+        type="text"
+      />
+    </div>
+    <button
+      className="btn btn-secondary"
+      type="submit"
+    >
+      Edit marker
+    </button>
+  </form>,
+]
+`;

@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<ul
+  className="markers-list"
+>
+  <li
+    className="col-xs-12 col-sm-6"
+  >
+    <div
+      className="content-wrapper"
+    >
+      <div
+        className="detail-section"
+      >
+        <h3>
+          
+        </h3>
+        <hr />
+        <p>
+          
+        </p>
+        <p>
+          <span>
+            Latitude:
+          </span>
+          <span />
+        </p>
+        <p>
+          <span>
+            Longitude:
+          </span>
+          <span />
+        </p>
+      </div>
+      <div
+        className="btn-group"
+      >
+        <button
+          className="btn btn-primary"
+          onClick={[Function]}
+          type="button"
+        >
+          Edit
+        </button>
+        <button
+          className="btn btn-secondary"
+          onClick={[Function]}
+          type="button"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </li>
+</ul>
+`;
