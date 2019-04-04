@@ -32,7 +32,7 @@ REFER TO THE SCREENSHOT IN THE ASSETS FOLDER. Libraries compared:-<br>
     google-map-react<br>
     google-maps-js
 
-### `Markers<br>`
+### `Markers`
 a) Add marker<br>
 Markers can be added from the map as well as the search box, present in the form. When we enter the value in the search box, the marker is not automatically added, by adding a  a break point in the form of a state object called positionObj, which retains the position and if the user clicks on the 'Add marker' button, then only the marker is displayed. This helps the user in a way that, they can also cancel the marker add even after pulling the data from Geocoding.<br>
 
