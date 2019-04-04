@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+// @flow
 const MarkerList = ({ onEditMarker, onRemoveMarker,  positionArr, formInEditMode }) => {
     
     const renderMarkerText = (position) => {

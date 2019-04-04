@@ -47,7 +47,7 @@ const App = () =>  {
 					<div className="map-wrapper col col-xs-12 col-sm-6">
 						<div className="mapComponent" id="mapComponent" />
 					</div>
-					{(map !== null) && <MapContainer map={map} />}
+					{(map !== null) && <MapContainer googleMaps={map} />}
 				</div>
 			</div>
 		</main>

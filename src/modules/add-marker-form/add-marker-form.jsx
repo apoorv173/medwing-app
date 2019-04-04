@@ -1,3 +1,4 @@
+// @flow
 import React, { Fragment, useState } from 'react';
 import { SearchField } from '../../components/';
 

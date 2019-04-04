@@ -1,145 +1,118 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { AddMarkerForm, MarkerList } from '..';
 
-let markers = [];
 const editIcon = 'http://maps.google.com/mapfiles/ms/icons/blue-pushpin.png';
+let markers = [];
 
-class MapContainer extends Component {
-    constructor(props) {
-        super(props);
-        this.getGeoCode = this.getGeoCode.bind(this);
-        this.state = {
-            positionArr: [],
-            displayForm: false,
-            formInEditMode: false,
-            errorMsg: null
-        }
-    }
+const MapContainer = ({ googleMaps }) => {
+    
+    const [displayForm, setDisplayForm] = useState(false);
+    const [formInEditMode, setFormInEditMode] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [indexToEdit, setIndexToEdit] = useState(null);
+    const [positionObj, setPositionObj] = useState(null);
+    const [positionArr, setPositionArr] = useState([]);
 
-    componentDidMount() {
-        const { map } = this.props;
-        map.addListener('click', (event) => {
-            this.addMarker(event.latLng);
+    useEffect(() => {
+        const mapListener = googleMaps.addListener('click', (event) => { addMarker(event.latLng);});
+        return () => new window.google.maps.event.removeListener(mapListener);
+    });
+
+    const addMarker = (location) => {
+        const marker = new window.google.maps.Marker({
+            map: googleMaps,
+            position: location
         });
+
+        const callback = function(results) {
+            setDisplayForm(false);
+            setPositionArr([...positionArr, results[0]]);
+            markers.push(marker);
+            setMarkers(googleMaps);
+        };
+        getGeoCode({'location': location}, callback);
     }
 
-    onLocationSearch = (location) => {
-        const callback = (function(results) {
-            this.setState({positionObj: results[0]});
-        }).bind(this);
-        this.getGeoCode({ 'address': location}, callback);
+    
+    const onLocationSearch = (location) => {
+        const callback = function(results) {
+            setPositionObj(results[0]);
+        };
+        getGeoCode({ 'address': location}, callback);
     }
 
-    getGeoCode(location, callback) {
-        const that = this;
+    const getGeoCode = (location, callback) => {
         const geocoder = new window.google.maps.Geocoder();
         
         geocoder.geocode(location , function(results, status) {
             if (status === 'OK') {
                 callback(results);
             } else {
-                that.setState({
-                    errorMsg: '0 results found, please change the search parameter or try again later.'
-                });
+                setErrorMsg('0 results found, please change the search parameter or try again later.');
             }
         });
     }
 
-    setMarkers(map) {
+    const setMarkers = (map) => {
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
         }
     }
 
-    addMarker(location) {
-        const { positionArr } = this.state;
-        const { map } = this.props;
-        const marker = new window.google.maps.Marker({
-            map: map,
-            position: location
-        });
+    const toggleForm = () => {
 
-        const callback = (function(results) {
-            this.setState({
-                positionObj: results[0],
-                positionArr: [...positionArr, results[0]],
-                displayForm: false,
-            });
-        }).bind(this);
-
-        this.getGeoCode({'location': location}, callback);
-        markers.push(marker);
-        this.setMarkers(map);
-    }
-
-    toggleForm = () => {
-        const { indexToEdit } = this.state;
-        this.setState({
-            displayForm: !this.state.displayForm,
-            formInEditMode: false,
-            errorMsg: null
-        });
-        if(!isNaN(indexToEdit)) {
+        setDisplayForm(!displayForm);
+        setFormInEditMode(false);
+        setErrorMsg(null);
+        if(!isNaN(indexToEdit) && markers[indexToEdit]) {
             markers[indexToEdit].setIcon(null);
         }
     }
 
-    removeMarker(index) {
-        markers[index].setMap(null);
-        markers = [...markers.slice(0, index), ...markers.slice(index + 1)];
+    const removeMarker = (index) => {
+        if (markers[index]) {
+            markers[index].setMap(null);
+            markers = [...markers.slice(0, index), ...markers.slice(index + 1)];
+        }
     }
-    onRemove = (index) => {
-        const { positionArr } = this.state;
-        this.removeMarker(index);
-        this.setState({
-            positionArr: [...positionArr.slice(0, index), ...positionArr.slice(index + 1)],
-        });
+    const onRemove = (index) => {
+        removeMarker(index);
+        setPositionArr([...positionArr.slice(0, index), ...positionArr.slice(index + 1)]);
     }
 
-    onEdit = (index, positionObj) => {
+    const onEdit = (index, obj) => {
         if(markers[index]) {
             markers[index].setIcon(editIcon);
-            this.setState({
-                formInEditMode: true,
-                displayForm: true,
-                positionObj: positionObj,
-                indexToEdit: index
-            });
+            setFormInEditMode(true);
+            setDisplayForm(true);
+            setPositionObj(obj);
+            setIndexToEdit(index);
         }
     }
 
-    handleSubmit = () => {
-        const { map } = this.props;
-        const { positionObj, positionArr, indexToEdit, formInEditMode } = this.state;
+    const handleSubmit = () => {
         const marker = new window.google.maps.Marker({
-            map: map,
+            map: googleMaps,
             position: positionObj.geometry.location,
         });
-
         if(positionObj) {
             if(!isNaN(indexToEdit) && formInEditMode) {
                 markers[indexToEdit].setMap(null);
                 markers = [...markers.slice(0, indexToEdit), marker, ...markers.slice(indexToEdit + 1)];
-                this.setState({
-                    positionArr: [...positionArr.slice(0, indexToEdit), positionObj, ...positionArr.slice(indexToEdit+1)],
-                    displayForm: false,
-                    formInEditMode: false,
-                    errorMsg: null,
-                });
+                setFormInEditMode(false);
+                setPositionArr([...positionArr.slice(0, indexToEdit), positionObj, ...positionArr.slice(indexToEdit+1)]);
             }
             else {
                 markers.push(marker);
-                this.setState({
-                    positionArr: [...positionArr, positionObj],
-                    displayForm: false,
-                    errorMsg: null
-                });
+                setPositionArr([...positionArr, positionObj]);
             }
-            this.setMarkers(map);
+            setErrorMsg(null);
+            setDisplayForm(false);
+            setMarkers(googleMaps);
         }
     }
 
-    renderError(msg = 'Please enter some value in the field') {
+    const renderError = (msg = 'Please enter some value in the field') => {
         return (
             <p className="error">
                 {msg}
@@ -147,15 +120,14 @@ class MapContainer extends Component {
         );
     }
 
-    renderFormComponents() {
-        const { displayForm, formInEditMode, positionObj, errorMsg } = this.state;
-        return (
+    return (
+        <div className="form-container col col-xs-12 col-sm-6">
             <Fragment>
                 <div className={`slider ${displayForm ? '' : 'closed'}`}>
-                    {errorMsg && this.renderError(errorMsg)}
+                    {errorMsg && renderError(errorMsg)}
                     <AddMarkerForm
-                        onSubmit={this.handleSubmit}
-                        onSearch={this.onLocationSearch}
+                        onSubmit={handleSubmit}
+                        onSearch={onLocationSearch}
                         formInEditMode={formInEditMode}
                         mapObjToEdit={positionObj}
                     />
@@ -168,35 +140,20 @@ class MapContainer extends Component {
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => {this.toggleForm()}}
+                    onClick={toggleForm}
                 >
                     {displayForm ? 'Cancel' : 'Add location'}
                 </button>
                 <hr />
             </Fragment>
-        );
-    }
-
-    renderMarkerList() {
-        const { positionArr, formInEditMode } = this.state;
-        return (
             <MarkerList
                 positionArr={positionArr}
-                onEditMarker={this.onEdit}
-                onRemoveMarker={this.onRemove}
+                onEditMarker={onEdit}
+                onRemoveMarker={onRemove}
                 formInEditMode={formInEditMode}
             />
-        );
-    }
-
-    render() {
-        return (
-            <div className="form-container col col-xs-12 col-sm-6">
-                {this.renderFormComponents()}
-                {this.renderMarkerList()}
-            </div>
-        );
-    }
+        </div>
+    );
 }
 
 export default MapContainer;
